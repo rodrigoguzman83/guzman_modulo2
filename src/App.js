@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter } from "react-router-dom";
 import Menu from "./Components/Menu/index";
 import RoutesWeb from "./Components/Routes/Routes";
+import firebase from "./Config/firebase";
 
 function App() {
   const [opciones, setOpciones] = useState([
