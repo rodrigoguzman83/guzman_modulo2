@@ -1,22 +1,56 @@
 import React from "react";
-import OptionMenu from "./OptionMenu";
-import { Navbar, Nav } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Navbar, Nav, Form } from "react-bootstrap";
+import NetContext from "../../Context/NetContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
-function Menu(props) {
+const styles = {
+  font: {
+    color: "#FFFFFF",
+  },
+};
+
+function Menu() {
   return (
-    <div>
-      <Navbar bg="primary" variant="dark" expand="lg">
-        <Navbar.Brand href="#home">Trabajo practico 2</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            {props.data.map((opcion) => (
-              <OptionMenu opcion={opcion} className="justify-content-end" />
-            ))}
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-    </div>
+    <NetContext.Consumer>
+      {(context) => (
+        <Navbar bg="primary" expand="lg" style={styles.font}>
+          <Navbar.Brand href="#home" style={styles.font}>
+            React Utn Ecommerce
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="mr-auto">
+              <Nav.Link as={Link} to={"/"} style={styles.font}>
+                <FontAwesomeIcon icon={faHome} />
+              </Nav.Link>
+              {!context.login && (
+                <>
+                  <Nav.Link as={Link} to={"/registro"} style={styles.font}>
+                    Registro
+                  </Nav.Link>
+                  <Nav.Link as={Link} to={"/login"} style={styles.font}>
+                    Login
+                  </Nav.Link>
+                </>
+              )}
+            </Nav>
+            <div>{context.email}</div>
+            {context.login && (
+              <>
+                <Form inline>
+                  <Nav.Link onClick={context.logoutUser} style={styles.font}>
+                    <FontAwesomeIcon icon={faSignOutAlt} />
+                  </Nav.Link>
+                </Form>
+              </>
+            )}
+          </Navbar.Collapse>
+        </Navbar>
+      )}
+    </NetContext.Consumer>
   );
 }
 

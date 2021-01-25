@@ -1,11 +1,17 @@
 import React, { Component } from "react";
-import ProductoDetalle from "./DetailsProduct";
 import Productos from "../Components/Products";
-import { getProductos } from "../Services/ProductsServices";
-import { Form, Container } from "react-bootstrap";
+import { Container, Spinner } from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import firebase from "../Config/firebase";
 
+const row = {
+  display: "flex",
+  alignItems: "center",
+  borderRadius: "10px",
+  marginBottom: "1em",
+  padding: "0.5em",
+};
 class Home extends Component {
   constructor() {
     super();
@@ -14,33 +20,38 @@ class Home extends Component {
       loading: true,
     };
   }
+
   componentDidMount() {
-    getProductos().then((data) => {
-      console.log("Data", data);
-      this.setState({
-        productos: data.data,
-        loading: false,
+    firebase.db
+      .collection("productos")
+      .get()
+      .then((querySnapshot) => {
+        console.log(querySnapshot.docs);
+        this.setState({
+          productos: querySnapshot.docs,
+          loading: false,
+        });
       });
-    });
   }
+
   render() {
     if (this.state.loading) {
-      return <div>Loading ...</div>;
-    } else {
       return (
         <Container>
-          <Form>
-            <Form.Group controlId="formBasicName" style={{ marginTop: "20px" }}>
-              <Form.Control
-                type="text"
-                placeholder="Ingrese nombre, marca, categoria"
-              />
-            </Form.Group>
-          </Form>
-          <Row>
+          <div style={{ position: "fixed", top: "50%", left: "50%" }}>
+            <Spinner animation="grow" />
+            <Spinner animation="grow" />
+            <Spinner animation="grow" />
+          </div>
+        </Container>
+      );
+    } else {
+      return (
+        <Container fluid>
+          <Row style={row}>
             {this.state.productos.map((producto) => (
-              <Col xs={12} md={4}>
-                <Productos productos={producto} />
+              <Col>
+                <Productos key={producto.id} productos={producto} />
               </Col>
             ))}
           </Row>

@@ -3,6 +3,8 @@ import Home from "../../Pages/Home";
 import Registro from "../../Pages/Register";
 import Login from "../../Pages/Login";
 import ProductoDetalle from "../../Pages/DetailsProduct";
+import Footer from "../Footer";
+
 function Routes() {
   return (
     <>
@@ -10,6 +12,7 @@ function Routes() {
       <Route path="/login" exact component={Login} />
       <Route path="/registro" exact component={Registro} />
       <Route path="/productos/:id" exact component={ProductoDetalle} />
+      <Footer />
     </>
   );
 }

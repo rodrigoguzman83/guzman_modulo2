@@ -1,40 +1,127 @@
-import React, { Component } from "react";
-import { Form, Button, Container } from "react-bootstrap";
+import React, { useState } from "react";
+import { Card, Form } from "react-bootstrap";
+import firebase from "../Config/firebase";
+import ButtonWithLoading from "../Components/Forms/ButtonWithLoading";
+import FormGroup from "../Components/Forms/FormGroup";
+import { useHistory } from "react-router-dom";
+import AlertCustom from "../Components/AlertCustom";
+import "../App.css";
 
-class Registro extends Component {
-  render() {
-    return (
-      <>
-        <Container>
-          <h1>Nuevo Usuario</h1>
-          <Form style={{ marginTop: "20px" }}>
-            <Form.Group controlId="formBasicName">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control type="text" placeholder="Ingrese su nombre" />
-            </Form.Group>
+function Registro() {
+  const [alert, setAlert] = useState({ variant: "", text: "" });
+  const history = useHistory();
+  const [form, setForm] = useState({
+    nombre: "",
+    apellido: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState({
+    nombre: "",
+    apellido: "",
+    email: "",
+    password: "",
+  });
+  const [spinner, setSpinner] = useState(false);
 
-            <Form.Group controlId="formBasicSurname">
-              <Form.Label>Apellido</Form.Label>
-              <Form.Control type="text" placeholder="Ingrese su Apellido" />
-            </Form.Group>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (form.nombre == "") {
+      setError({
+        ...error,
+        nombre: "El campo nombre es obligatorio",
+      });
+      return;
+    }
+    setSpinner(true);
+    let email = form.email;
+    let password = form.password;
+    firebase.auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((data) => {
+        console.log("Usuario creado", data.user.uid);
+        firebase.db
+          .collection("usuarios")
+          .add({
+            nombre: form.nombre,
+            apellido: form.apellido,
+            email: form.email,
+            userId: data.user.uid,
+          })
+          .then((data) => {
+            setSpinner(false);
+            console.log(data);
+            history.push("/");
+          })
+          .catch((err) => {
+            console.log(err);
+            setSpinner(false);
+            setAlert({ variant: "danger", text: error.message });
+          });
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        setSpinner(false);
+        setAlert({ variant: "danger", text: error.message });
+      });
+  };
+  const handleChange = (e) => {
+    const target = e.target;
+    const value = target.value;
+    const name = target.name;
 
-            <Form.Group controlId="formBasicEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" placeholder="Ingrese su Email" />
-            </Form.Group>
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+  return (
+    <Card
+      style={{ width: "50%", margin: " 3em auto auto auto", padding: "2em" }}
+    >
+      <Card.Body>
+        <Card.Title>Registrarse</Card.Title>
 
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Ingrese su Clave" />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Registrarse
-            </Button>
-          </Form>
-        </Container>
-      </>
-    );
-  }
+        <Form onSubmit={handleSubmit}>
+          <FormGroup
+            label="Nombre"
+            type="text"
+            placeholder="Ingrese su nombre"
+            name="nombre"
+            value={form.nombre}
+            change={handleChange}
+          />
+          <FormGroup
+            label="Apellido"
+            type="text"
+            placeholder="Ingrese su apellido"
+            name="apellido"
+            value={form.apellido}
+            change={handleChange}
+          />
+          <FormGroup
+            label="Email"
+            type="email"
+            placeholder="Ingrese su email"
+            name="email"
+            value={form.email}
+            change={handleChange}
+          />
+          <FormGroup
+            label="Contraseña"
+            type="password"
+            placeholder="Ingrese su contraseña"
+            name="password"
+            value={form.password}
+            change={handleChange}
+          />
+
+          <ButtonWithLoading text="Registrarse" loading={spinner} />
+          <AlertCustom variant={alert.variant} text={alert.text} />
+        </Form>
+      </Card.Body>
+    </Card>
+  );
 }
 
 export default Registro;

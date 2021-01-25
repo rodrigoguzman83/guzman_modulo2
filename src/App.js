@@ -3,8 +3,7 @@ import "./App.css";
 import { BrowserRouter } from "react-router-dom";
 import Menu from "./Components/Menu/index";
 import RoutesWeb from "./Components/Routes/Routes";
-import firebase from "./Config/firebase";
-
+import GlobalState from "./Context/GlobalState";
 function App() {
   const [opciones, setOpciones] = useState([
     {
@@ -12,12 +11,12 @@ function App() {
       label: "Home",
     },
     {
-      path: "/login",
-      label: "Login",
+      path: "/registro",
+      label: "Register",
     },
     {
-      path: "/registro",
-      label: "Registro",
+      path: "/login",
+      label: "Login",
     },
   ]);
 
@@ -31,10 +30,12 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Menu data={opciones} />
-      <RoutesWeb />
-    </BrowserRouter>
+    <GlobalState>
+      <BrowserRouter>
+        <Menu data={opciones} />
+        <RoutesWeb />
+      </BrowserRouter>
+    </GlobalState>
   );
 }
 
